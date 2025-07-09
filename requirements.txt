@@ -1,8 +1,12 @@
 Pillow==9.3.0
 matplotlib==3.7.1
 torch==1.13.0
-radifox @ git+https://github.com/jh-mipc/radifox.git@a07a8fa8c7b601624b3ccf5bc521ccc0177d1f37
-torchio @ git+https://github.com/blakedewey/torchio.git@6624576490fa56a0decd1e92aaf86f3a6ecdbc59torchvision
+torchvision==0.14.0
 tqdm==4.64.1
 SimpleITK==2.2.1
-numpy==2.2.6
+numpy==1.26.4
+tensorboard==2.14.0
+
+# GitHub packages
+torchio @ git+https://github.com/blakedewey/torchio.git@6624576490fa56a0decd1e92aaf86f3a6ecdbc59
+

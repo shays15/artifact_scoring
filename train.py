@@ -29,15 +29,15 @@ from torchio.transforms import Lambda
 from torchio.transforms.augmentation import RandomTransform
 from torchio.typing import TypeRangeFloat
 from torchio.data.io import nib_to_sitk
-from radifox.utils.degrade.degrade import WINDOW_OPTIONS, fwhm_needed, select_kernel
-from radifox.utils.resize.pytorch import resize
 import SimpleITK as sitk
 import os
 
 # ==== ARGPARSE ====
 parser = argparse.ArgumentParser(description="Run artifact scoring on a NIfTI image")
 parser.add_argument('--dataset', type=str, required=True, help='Path to training directory')
+parser.add_argument('--exp_name', type=str, required=True, help='Output directory name')
 parser.add_argument('--gpu', type=int, default=0, help='GPU ID to use (default: 0)')
+parser.add_argument('--pretrained', type=str, default=None, help='Path to pretrained weights')
 args = parser.parse_args()
 
 class ArtifactTransform:
@@ -279,12 +279,11 @@ default_transform = Compose([
 mode = 'train'
 device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 encoder_out_dim = 1
-pretrained_weight_fpath = None
 lr = 1e-3
 
-# Define dataset parameters
-dataset_dirs = ['/iacl/pg23/savannah/data_1mm/slices_norm/treatms-0100/']
 dataset_dirs = {args.dataset}
+exp_name = args.exp_name
+pretrained = args.pretrained
 
 # Create train and validation datasets
 train_dataset = ContrastiveMRIDataset(dataset_dirs, mode='train')
@@ -337,19 +336,14 @@ def save_progress(artifact_encoder, img_a, img_b, img_with_artifacts, save_dir, 
         f.write(f"Scores img_with_artifacts: {scores_artifacts}\n")
         f.write("\n")
 
-exp_name = 'exp_name'
-GPUID = 1
-encoder_out_dim = 1
-pretrained_weight_fpath = None
-lr = 1e-3
-
-device = torch.device(f"cuda:{GPUID}")
-
 artifact_encoder = SimpleEncoder(in_ch=1, out_ch=encoder_out_dim).to(device)
 
-if pretrained_weight_fpath:
-    checkpoint = torch.load(pretrained_weight_fpath, map_location=device)
-    artifact_encoder.load_state_dict(checkpoint["encoder"])
+if args.pretrained is not None:
+    print(f"Loading weights from {args.pretrained}")
+    checkpoint = torch.load(args.pretrained, map_location=device)
+    artifact_encoder.load_state_dict(checkpoint['encoder'])
+else:
+    print("Training from scratch.")
 
 opt = torch.optim.Adam(artifact_encoder.parameters(), lr=lr, weight_decay=1e-5)
 writer = SummaryWriter(log_dir=f"./{exp_name}/runs")
