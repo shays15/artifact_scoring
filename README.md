@@ -85,7 +85,7 @@ artifact_scoring/
 If you use this code, please cite our MIDL 2025 paper:
 
 ```
-Hays, S.*, Remedios, S.*, Dewey, B.E., Prince, J.L., Landman, B.A., Pham, D.L., Newsome, S.D., Mowry, E.M. 
+Hays, S.P., Zuo, L., Dewey, B.E., Remedios, S.W., Zhang, J., Mowry, E.M., Newsome, S.D., Carass, A., and Prince, J.L.
 "An Unsupervised Approach for Artifact Severity Scoring in Multi-Contrast MR Images." 
 Medical Imaging with Deep Learning (MIDL), 2025.
 ```
