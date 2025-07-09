@@ -73,7 +73,6 @@ The script will extract the central 60% of slices, apply necessary preprocessing
 artifact_scoring/
 ├── train.py              # Training script
 ├── test.py               # Slice-based inference and scoring
-├── utils.py              # Model + transform definitions
 ├── requirements.txt
 └── README.md
 ```
