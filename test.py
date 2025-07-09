@@ -1,4 +1,5 @@
 # ===== Standard imports =====
+import argparse
 import os
 from glob import glob
 import nibabel as nib
@@ -8,14 +9,22 @@ from tqdm.auto import tqdm
 
 # ===== Torch and related =====
 import torch
+import torch.nn as nn
 from torchvision.transforms import Compose, ToPILImage, Pad, CenterCrop, ToTensor, Resize
+from torchvision.transforms.functional import pil_to_tensor
 from pathlib import Path
-from utils import ConvBlock2d, SimpleEncoder
+#from utils import ConvBlock2d, SimpleEncoder
+
+# ==== ARGPARSE ====
+parser = argparse.ArgumentParser(description="Run artifact scoring on a NIfTI image")
+parser.add_argument('--nifti-path', type=str, required=True, help='Path to NIfTI file')
+parser.add_argument('--gpu', type=int, default=0, help='GPU ID to use (default: 0)')
+args = parser.parse_args()
 
 # ==== CONFIG ====
-NIFTI_PATH = args
-MODEL_PATH = "/iacl/pg23/savannah/projects/harmonization/eta_encoder_sav/triplet_loss_1d_margin_unregistered_treatms_sites_20250125/checkpoints/models/model_epoch_5.pth"
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+MODEL_PATH = "model_a5fb8712.pth"
+DEVICE = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
+NIFTI_PATH = args.nifti_path
 
 # ==== DEFINE TRANSFORM ====
 default_transform = Compose([
@@ -23,10 +32,46 @@ default_transform = Compose([
     Pad(400),
     CenterCrop((224, 224)),
 ])
+# ==== MODEL ===
+# Network
+class ConvBlock2d(nn.Module):
+    def __init__(self, in_ch, mid_ch, out_ch):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_ch, mid_ch, 3, 1, 1),
+            nn.InstanceNorm2d(mid_ch, affine=True),
+            nn.LeakyReLU(0.1),
+            nn.Conv2d(mid_ch, out_ch, 3, 1, 1),
+            nn.InstanceNorm2d(out_ch, affine=True),
+            nn.LeakyReLU(0.1)
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
+class SimpleEncoder(nn.Module):
+    def __init__(self, in_ch=1, out_ch=128):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            ConvBlock2d(in_ch, 16, 16),
+            ConvBlock2d(16, 64, 64),
+            nn.Conv2d(64, out_ch, kernel_size=3, stride=1),
+            nn.AdaptiveAvgPool2d(1)
+        )
+        #self.activation = nn.Sigmoid()
+        #self.activation = nn.ReLU()
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = x.view(x.size(0), -1)  # Flatten to (B, out_ch)
+        #x = self.activation(x)
+        x = torch.abs(x)
+        return x
 
 # ==== LOAD MODEL ====
 model = SimpleEncoder(in_ch=1, out_ch=1).to(DEVICE)
-model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+checkpoint = torch.load(MODEL_PATH, map_location=DEVICE)
+model.load_state_dict(checkpoint["encoder"])
 model = model.to(DEVICE)
 model.eval()
 
