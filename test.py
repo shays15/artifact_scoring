@@ -6,14 +6,13 @@ import nibabel as nib
 import numpy as np
 import random
 from tqdm.auto import tqdm
+from pathlib import Path
 
 # ===== Torch and related =====
 import torch
 import torch.nn as nn
 from torchvision.transforms import Compose, ToPILImage, Pad, CenterCrop, ToTensor, Resize
 from torchvision.transforms.functional import pil_to_tensor
-from pathlib import Path
-#from utils import ConvBlock2d, SimpleEncoder
 
 # ==== ARGPARSE ====
 parser = argparse.ArgumentParser(description="Run artifact scoring on a NIfTI image")
