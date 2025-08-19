@@ -1,5 +1,5 @@
 # 📌 Artifact Severity Scoring
-
+![methods](methods_wider.png)
 This repository contains the code and pretrained weights accompanying our [MIDL 2025 paper](https://2025.midl.io) titled:  
 **_An Unsupervised Approach for Artifact Severity Scoring in Multi-Contrast MR Images_** [PAPER](https://openreview.net/pdf?id=73GUgAhllx)
 [POSTER](https://drive.google.com/file/d/14AsIyT_uLlztVNmkVWb7Cnq1kdE43hXW/view?usp=sharing)
