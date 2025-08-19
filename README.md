@@ -1,7 +1,8 @@
 # 📌 Artifact Severity Scoring
 
 This repository contains the code and pretrained weights accompanying our [MIDL 2025 paper](https://2025.midl.io) titled:  
-**_An Unsupervised Approach for Artifact Severity Scoring in Multi-Contrast MR Images_** [LINK](https://openreview.net/forum?id=73GUgAhllx#discussion) [POSTER](https://drive.google.com/file/d/14AsIyT_uLlztVNmkVWb7Cnq1kdE43hXW/view?usp=sharing)
+**_An Unsupervised Approach for Artifact Severity Scoring in Multi-Contrast MR Images_** [PAPER](https://openreview.net/pdf?id=73GUgAhllx)
+[POSTER](https://drive.google.com/file/d/14AsIyT_uLlztVNmkVWb7Cnq1kdE43hXW/view?usp=sharing)
 
 We present an unsupervised deep learning method for quantifying artifact severity in clinical multi-contrast MR scans, particularly in the presence of noise, motion, and ghosting artifacts. Our model predicts a scalar severity score per image or slice, enabling automated quality control without manual annotations.
 
